@@ -1,5 +1,6 @@
 from .utils import get_page
 from pyquery import PyQuery as pq
+from bs4 import BeautifulSoup
 
 
 class ProxyMetaclass(type):
@@ -28,6 +29,27 @@ class FreeProxyGetter(object, metaclass=ProxyMetaclass):
             print('Getting', proxy, 'from', callback)
             proxies.append(proxy)
         return proxies
+
+    def crawl_ip181(self):
+        start_url = 'http://www.ip181.com/'
+        html = get_page(start_url)
+        if html:
+            soup = BeautifulSoup(html, 'lxml')
+            results = soup.select('tr.warning')
+            for i in results:
+                result = str(i.select('td')[0].text + ':' + i.select('td')[1].text)
+                yield result.replace(' ', '')
+
+
+    def crawl_xicidaili(self):
+        start_url = 'http://www.xicidaili.com/wt/'
+        html = get_page(start_url)
+        if html:
+            soup = BeautifulSoup(html,'lxml')
+            results = soup.select('tr.odd')
+            for i in results:
+                result = str(i.select('td')[1].text + ':' + i.select('td')[2].text)
+                yield result.replace(' ', '')
 
     def crawl_daili66(self, page_count=4):
         start_url = 'http://www.66ip.cn/{}.html'
@@ -65,11 +87,7 @@ class FreeProxyGetter(object, metaclass=ProxyMetaclass):
                 td.find('p').remove()
                 yield td.text().replace(' ', '')
 
-    def crawl_haoip(self):
-        start_url = 'http://haoip.cc/tiqu.htm'
-        html = get_page(start_url)
-        if html:
-            doc = pq(html)
-            results = doc('.row .col-xs-12').html().split('<br/>')
-            for result in results:
-                if result: yield result.strip()
+
+
+
+
