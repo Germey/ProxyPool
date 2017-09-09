@@ -3,9 +3,9 @@ from multiprocessing import Process
 import asyncio
 import aiohttp
 try:
-    from aiohttp.errors import ProxyConnectionError
+    from aiohttp.errors import ProxyConnectionError,ServerDisconnectedError,ClientResponseError,ClientConnectorError
 except:
-    from aiohttp import  ClientProxyConnectionError as ProxyConnectionError
+    from aiohttp import ClientProxyConnectionError as ProxyConnectionError,ServerDisconnectedError,ClientResponseError,ClientConnectorError
 from proxypool.db import RedisClient
 from proxypool.error import ResourceDepletionError
 from proxypool.getter import FreeProxyGetter
@@ -28,18 +28,22 @@ class ValidityTester(object):
         """
         text one proxy, if valid, put them to usable_proxies.
         """
-        async with aiohttp.ClientSession() as session:
-            try:
-                if isinstance(proxy, bytes):
-                    proxy = proxy.decode('utf-8')
-                real_proxy = 'http://' + proxy
-                print('Testing', proxy)
-                async with session.get(self.test_api, proxy=real_proxy, timeout=get_proxy_timeout) as response:
-                    if response.status == 200:
-                        self._conn.put(proxy)
-                        print('Valid proxy', proxy)
-            except (ProxyConnectionError, TimeoutError, ValueError):
-                print('Invalid proxy', proxy)
+        try:
+            async with aiohttp.ClientSession() as session:
+                try:
+                    if isinstance(proxy, bytes):
+                        proxy = proxy.decode('utf-8')
+                    real_proxy = 'http://' + proxy
+                    print('Testing', proxy)
+                    async with session.get(self.test_api, proxy=real_proxy, timeout=get_proxy_timeout) as response:
+                        if response.status == 200:
+                            self._conn.put(proxy)
+                            print('Valid proxy', proxy)
+                except (ProxyConnectionError, TimeoutError, ValueError):
+                    print('Invalid proxy', proxy)
+        except (ServerDisconnectedError, ClientResponseError,ClientConnectorError) as s:
+            print(s)
+            pass
 
     def test(self):
         """
