@@ -1,6 +1,6 @@
 from .utils import get_page
 from pyquery import PyQuery as pq
-from bs4 import BeautifulSoup
+import re
 
 
 class ProxyMetaclass(type):
@@ -21,7 +21,6 @@ class ProxyMetaclass(type):
 
 
 class FreeProxyGetter(object, metaclass=ProxyMetaclass):
-
     def get_raw_proxies(self, callback):
         proxies = []
         print('Callback', callback)
@@ -33,23 +32,36 @@ class FreeProxyGetter(object, metaclass=ProxyMetaclass):
     def crawl_ip181(self):
         start_url = 'http://www.ip181.com/'
         html = get_page(start_url)
-        if html:
-            soup = BeautifulSoup(html, 'lxml')
-            results = soup.select('tr.warning')
-            for i in results:
-                result = str(i.select('td')[0].text + ':' + i.select('td')[1].text)
-                yield result.replace(' ', '')
+        ip_adress = re.compile('<tr.*?>\s*<td>(.*?)</td>\s*<td>(.*?)</td>')
+        # \s* 匹配空格，起到换行作用
+        re_ip_adress = ip_adress.findall(html)
+        for adress,port in re_ip_adress:
+            result = adress + ':' + port
+            yield result.replace(' ', '')
 
 
     def crawl_xicidaili(self):
-        start_url = 'http://www.xicidaili.com/wt/'
-        html = get_page(start_url)
-        if html:
-            soup = BeautifulSoup(html,'lxml')
-            results = soup.select('tr.odd')
-            for i in results:
-                result = str(i.select('td')[1].text + ':' + i.select('td')[2].text)
+        for page in range(1, 4):
+            start_url = 'http://www.xicidaili.com/wt/{}'.format(page)
+            html = get_page(start_url)
+            ip_adress = re.compile('<td class="country"><img src="http://fs.xicidaili.com/images/flag/cn.png" alt="Cn" /></td>\s*<td>(.*?)</td>\s*<td>(.*?)</td>')
+            # \s* 匹配空格，起到换行作用
+            re_ip_adress = ip_adress.findall(html)
+            for adress, port in re_ip_adress:
+                result = adress+':'+ port
                 yield result.replace(' ', '')
+
+    def crawl_ip3366(self):
+        for page in range(1, 4):
+            start_url = 'http://www.ip3366.net/free/?stype=1&page={}'.format(page)
+            html = get_page(start_url)
+            ip_adress = re.compile('<tr>\s*<td>(.*?)</td>\s*<td>(.*?)</td>')
+            # \s * 匹配空格，起到换行作用
+            re_ip_adress = ip_adress.findall(html)
+            for adress, port in re_ip_adress:
+                result = adress+':'+ port
+                yield result.replace(' ', '')
+
 
     def crawl_daili66(self, page_count=4):
         start_url = 'http://www.66ip.cn/{}.html'
@@ -65,6 +77,7 @@ class FreeProxyGetter(object, metaclass=ProxyMetaclass):
                     port = tr.find('td:nth-child(2)').text()
                     yield ':'.join([ip, port])
 
+
     def crawl_proxy360(self):
         start_url = 'http://www.proxy360.cn/Region/China'
         print('Crawling', start_url)
@@ -77,6 +90,7 @@ class FreeProxyGetter(object, metaclass=ProxyMetaclass):
                 port = line.find('.tbBottomLine:nth-child(2)').text()
                 yield ':'.join([ip, port])
 
+
     def crawl_goubanjia(self):
         start_url = 'http://www.goubanjia.com/free/gngn/index.shtml'
         html = get_page(start_url)
@@ -86,6 +100,28 @@ class FreeProxyGetter(object, metaclass=ProxyMetaclass):
             for td in tds:
                 td.find('p').remove()
                 yield td.text().replace(' ', '')
+
+    def crawl_data5u(self):
+        for i in ['gngn', 'gnpt']:
+            start_url = 'http://www.data5u.com/free/{}/index.shtml'.format(i)
+            html = get_page(start_url)
+            ip_adress = re.compile(' <ul class="l2">\s*<span><li>(.*?)</li></span>\s*<span style="width: 100px;"><li class=".*">(.*?)</li></span>')
+            # \s * 匹配空格，起到换行作用
+            re_ip_adress = ip_adress.findall(html)
+            for adress, port in re_ip_adress:
+                result = adress+':'+port
+                yield result.replace(' ','')
+
+    def crawl_kxdaili(self):
+        for i in range(1, 4):
+            start_url = 'http://www.kxdaili.com/ipList/{}.html#ip'.format(i)
+            html = get_page(start_url)
+            ip_adress = re.compile('<tr.*?>\s*<td>(.*?)</td>\s*<td>(.*?)</td>')
+            # \s* 匹配空格，起到换行作用
+            re_ip_adress = ip_adress.findall(html)
+            for adress, port in re_ip_adress:
+                result = adress + ':' + port
+                yield result.replace(' ', '')
 
 
 
