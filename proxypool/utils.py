@@ -2,11 +2,14 @@ import requests
 import asyncio
 import aiohttp
 from requests.exceptions import ConnectionError
-from fake_useragent import UserAgent
+from fake_useragent import UserAgent,FakeUserAgentError
 import random
 
 def get_page(url, options={}):
-    ua = UserAgent()
+    try:
+        ua = UserAgent()
+    except FakeUserAgentError:
+        pass
     base_headers = {
         'User-Agent':  ua.random,
         'Accept-Encoding': 'gzip, deflate, sdch',
