@@ -130,3 +130,23 @@ class FreeProxyGetter(object, metaclass=ProxyMetaclass):
                 for adress, port in zip(re_ip_adress1, re_ip_adress2):
                     adress_port = adress + ':' + port
                     yield adress_port.replace(' ', '')
+    def crawl_yundaili(self):
+        for i in range(1, 4):
+            start_url = 'http://www.yun-daili.com/free.asp?stype=1&page={}'.format(i)
+            html = get_page(start_url)
+            doc = pq(html)
+            trs = doc('#list table tr:gt(0)').items()
+            for tr in trs:
+                ip = tr.find('td:nth-child(1)').text()
+                port = tr.find('td:nth-child(2)').text()
+                yield ':'.join([ip, port])
+    def crawl_ip3366(self):
+        for i in range(1, 6):
+            start_url = 'http://www.ip3366.net/?stype=1&page={}'.format(i)
+            html = get_page(start_url)
+            doc = pq(html)
+            trs = doc('#list table tr:gt(0)').items()
+            for tr in trs:
+                ip = tr.find('td:nth-child(1)').text()
+                port = tr.find('td:nth-child(2)').text()
+                yield ':'.join([ip, port])
