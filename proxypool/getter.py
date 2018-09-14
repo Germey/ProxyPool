@@ -35,7 +35,7 @@ class FreeProxyGetter(object, metaclass=ProxyMetaclass):
         html = get_page(start_url)
         ip_adress = re.compile('<tr.*?>\s*<td>(.*?)</td>\s*<td>(.*?)</td>')
         # \s* 匹配空格，起到换行作用
-        re_ip_adress = ip_adress.findall(html)
+        re_ip_adress = ip_adress.findall(str(html))
         for adress, port in re_ip_adress:
             result = adress + ':' + port
             yield result.replace(' ', '')
@@ -48,7 +48,7 @@ class FreeProxyGetter(object, metaclass=ProxyMetaclass):
             ip_adress = re.compile(
                 '<td data-title="IP">(.*)</td>\s*<td data-title="PORT">(\w+)</td>'
             )
-            re_ip_adress = ip_adress.findall(html)
+            re_ip_adress = ip_adress.findall(str(html))
             for adress, port in re_ip_adress:
                 result = adress + ':' + port
                 yield result.replace(' ', '')
@@ -61,7 +61,7 @@ class FreeProxyGetter(object, metaclass=ProxyMetaclass):
                 '<td class="country"><img src="http://fs.xicidaili.com/images/flag/cn.png" alt="Cn" /></td>\s*<td>(.*?)</td>\s*<td>(.*?)</td>'
             )
             # \s* 匹配空格，起到换行作用
-            re_ip_adress = ip_adress.findall(html)
+            re_ip_adress = ip_adress.findall(str(html))
             for adress, port in re_ip_adress:
                 result = adress + ':' + port
                 yield result.replace(' ', '')
@@ -88,7 +88,7 @@ class FreeProxyGetter(object, metaclass=ProxyMetaclass):
                 ' <ul class="l2">\s*<span><li>(.*?)</li></span>\s*<span style="width: 100px;"><li class=".*">(.*?)</li></span>'
             )
             # \s * 匹配空格，起到换行作用
-            re_ip_adress = ip_adress.findall(html)
+            re_ip_adress = ip_adress.findall(str(html))
             for adress, port in re_ip_adress:
                 result = adress + ':' + port
                 yield result.replace(' ', '')
@@ -99,7 +99,7 @@ class FreeProxyGetter(object, metaclass=ProxyMetaclass):
             html = get_page(start_url)
             ip_adress = re.compile('<tr.*?>\s*<td>(.*?)</td>\s*<td>(.*?)</td>')
             # \s* 匹配空格，起到换行作用
-            re_ip_adress = ip_adress.findall(html)
+            re_ip_adress = ip_adress.findall(str(html))
             for adress, port in re_ip_adress:
                 result = adress + ':' + port
                 yield result.replace(' ', '')
@@ -111,7 +111,7 @@ class FreeProxyGetter(object, metaclass=ProxyMetaclass):
             html = get_page(start_url)
             if html:
                 ip_adress = re.compile('<td data-label="IP:port ">(.*?)</td>')
-                re_ip_adress = ip_adress.findall(html)
+                re_ip_adress = ip_adress.findall(str(html))
                 for adress_port in re_ip_adress:
                     yield adress_port.replace(' ', '')
 
@@ -123,7 +123,7 @@ class FreeProxyGetter(object, metaclass=ProxyMetaclass):
             if html:
                 ip_adress1 = re.compile(
                     "title='View this Proxy details'>\s*(.*).*")
-                re_ip_adress1 = ip_adress1.findall(html)
+                re_ip_adress1 = ip_adress1.findall(str(html))
                 ip_adress2 = re.compile(
                     "title='Select proxies with port number .*'>(.*)</a>")
                 re_ip_adress2 = ip_adress2.findall(html)
