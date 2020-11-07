@@ -126,7 +126,7 @@ class FreeProxyGetter(object, metaclass=ProxyMetaclass):
                 re_ip_adress1 = ip_adress1.findall(str(html))
                 ip_adress2 = re.compile(
                     "title='Select proxies with port number .*'>(.*)</a>")
-                re_ip_adress2 = ip_adress2.findall(html)
+                re_ip_adress2 = ip_adress2.findall(str(html))
                 for adress, port in zip(re_ip_adress1, re_ip_adress2):
                     adress_port = adress + ':' + port
                     yield adress_port.replace(' ', '')

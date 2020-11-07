@@ -24,6 +24,7 @@ class ValidityTester(object):
         self._raw_proxies = proxies
         self._conn = RedisClient()
 
+    # 利用aiohttp实现异步检测
     async def test_single_proxy(self, proxy):
         """
         text one proxy, if valid, put them to usable_proxies.
@@ -102,8 +103,8 @@ class Schedule(object):
         """
         Get half of proxies which in redis
         """
-        conn = RedisClient()
-        tester = ValidityTester()
+        conn = RedisClient()  # redis连接对象
+        tester = ValidityTester()  # 用来检测代理是否可用的类
         while True:
             print('Refreshing ip')
             count = int(0.5 * conn.queue_len)
@@ -132,6 +133,8 @@ class Schedule(object):
 
     def run(self):
         print('Ip processing running')
+        # 运行了两个进程,check_pool是从网上获取代理,进行筛选,放到数据库.
+        # valid_proxy是从数据库里拿出来检测
         valid_process = Process(target=Schedule.valid_proxy)
         check_process = Process(target=Schedule.check_pool)
         valid_process.start()
